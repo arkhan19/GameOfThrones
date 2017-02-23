@@ -85,14 +85,54 @@ gotsim = wtv.Word2Vec(
             )
 
 gotsim.build_vocab(sentences)
-print("WtV vocab length:", len(thrones2vec.vocab))
+print("WtV vocab length:", len(gotsim.vocab))
 
 # End of La la Land now training begins
 gotsim.train(sentences)
 
 # Now save the training model PLEASEEEEEE
-if not os.path.exists("trained"):
-    os.mkdir("trained")
+if not os.path.exists("GameOfThrones/data/trained"):
+    os.mkdir("GameOfThrones/data/trained")
+
 gotsim.save(os.path.join("GameOfThrones/data/trained", "gotsim.w2v"))
 
+###### End of Tr Tr Train Land ######
 
+# Visualize the model now using t-sne we will compress the data to 2D plot
+tsne = sklearn.manifold.TSNE(n_components=2, random_state=0)
+all_word_vectors_matrix = gotsim.syn0
+
+all_word_vectors_matrix_2d = tsne.fit_transform(all_word_vectors_matrix)
+
+# Plot in a table
+points = kungfu.DataFrame(
+    [
+        (word, coords[0], coords[1])
+        for word, coords in [
+            (word, all_word_vectors_matrix_2d[gotsim.vocab[word].index])
+            for word in gotsim.vocab
+        ]
+    ],
+    columns=["word", "x", "y"]
+)
+# Points contains the squashed words now
+points.head(10)
+
+sb.set_context("poster")
+points.plot.scatter("x", "y", s=10, figsize=(20,12))
+
+# Plot a Region Template
+
+
+def plot_region(x_bounds, y_bounds):
+    slice = points[
+        (x_bounds[0] <= points.x)&
+        (points.x <= x_bounds[1])&
+        (y_bounds[0] <= points.y)&
+        (points.y <= y_bounds[1])
+    ]
+    ax = slice.plot.scatter("x", "y", s=35, figsize=(10,8))
+    for i, point in slice.iterrows():
+        ax.text(point.x + 0.005, point.y + 0.005, point.word, fontsize=1)
+
+plot_region(x_bounds=(4.0, 4.2), y_bounds=(-0.5, -0.1))
