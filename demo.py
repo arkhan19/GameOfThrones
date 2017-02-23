@@ -102,7 +102,7 @@ gotsim.save(os.path.join("GameOfThrones/data/trained", "gotsim.w2v"))
 tsne = sklearn.manifold.TSNE(n_components=2, random_state=0)
 all_word_vectors_matrix = gotsim.syn0
 
-all_word_vectors_matrix_2d = tsne.fit_transform(all_word_vectors_matrix)
+all_word_vectors_matrix_2d = tsne.fit_transform(all_word_vectors_matrix) # This will take a lot of time.
 
 # Plot in a table
 points = kungfu.DataFrame(
@@ -136,3 +136,6 @@ def plot_region(x_bounds, y_bounds):
         ax.text(point.x + 0.005, point.y + 0.005, point.word, fontsize=1)
 
 plot_region(x_bounds=(4.0, 4.2), y_bounds=(-0.5, -0.1))
+
+# for similarity check
+gotsim.most_similar("Rahegar") #Whatever you want to check
